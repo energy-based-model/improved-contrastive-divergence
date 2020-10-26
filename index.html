@@ -142,7 +142,7 @@ A common objective used to train EBMs is <a =href="https://www.cs.toronto.edu/~h
 <p style="font-size:14px">
 where we the minimize the difference between the KL divergence of the data distribution and EBM distribution, and the KL divergence of finite number of MCMC steps on data distribution and EBM distribution.
 
-This objective has a key gradient (highlighted in red) that is ignored.
+This objective has a key gradient (highlighted in red) that is often ignored.
 </p>
 
 <p>
@@ -151,15 +151,15 @@ This objective has a key gradient (highlighted in red) that is ignored.
 
 <p style="font-size:14px">
 We present a loss to capture this gradient (see our paper for details), and find that this missing gradient contributes substantially to the overall training gradient of a EBM.
-</p>
 
+<!---
 <p>
 <center><a> <img src="fig/cd_kl.png" style="float:none;width:400px"> </a></center>
 </p>
+-->
 
 
 
-<p style="font-size:14px">
 We further show below that that by adding  a KL term into contrastive divergence training of energy models, overall training is greatly stabilized. In the graph below, we investigate the energy difference between real images and generated samples with or without the KL term. Stable EBM training corresponds to an energy difference of around 0. We find that the addition of the KL loss term enables incoperation of architectural blocks such as self-attention and normalization, while the absence of the KL term leads to a necessity of spectral normalization to train models stably.
 </p>
 
@@ -172,6 +172,10 @@ We further show below that that by adding  a KL term into contrastive divergence
 <p style="font-size:14px">
 We illustrate our the overall image generation process with EBMs below. We intersperse Langevin sampling with data augmentation transitions, enabling image sampling chains from our model to traverse across a large number of modes in the energy landscape. 
 
+</p>
+
+<p>
+<center><a> <img src="fig/langevin_data.gif" style="float:none;width:480"> </a></center>
 </p>
 
 <p>
