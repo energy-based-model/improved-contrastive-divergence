@@ -1,4 +1,4 @@
 # compositional-generation-inference
-Compositional Visual Generation and Inference with Energy Based Models
+Improved Contrastive Divergence Framework for Training Energy Based Models
 
-https://energy-based-model.github.io/compositional-generation-inference/
+https://energy-based-model.github.io/improved-contrastive-divergence/
