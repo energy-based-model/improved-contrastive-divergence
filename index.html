@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
-  <title>Compositional Visual Generation and Inference with Energy Based Models</title>
+  <title>Improved Contrastive Divergence Training of Energy Based Models</title>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 
-<meta property="og:image" content="fig/comp_cartoon.jpg"/>
+<meta property="og:image" content="fig/uncond_gen.gif"/>
 <meta property="og:title" content="Improved Contrastive Divergence Training of Energy Based Models" />
 
 <script src="lib.js" type="text/javascript"></script>
@@ -97,13 +97,14 @@ We propose several different techniques to improve contrastive divergence traini
 </p>
 
 
-<h2>Code: <a href=''>Pytorch</a> </h2>
+<h2><a href=''>Pytorch Code</a> </h2>
 
 <br><br>
 
 <!-- ---------------------------------------------------------------------------------- -->
 <p>
 <h2>Method</h2>
+
 Energy based models (EBMs) represent the likelihood of a probability distribution of data by assigning an unnormalized probability scalar (or "energy") to each input data point. This provides significant model flexibility; any arbitrary model that outputs a real number can be used as an energy model. A difficulty however, is that training EBMs is hard, as to properly maximize the likelihood of an energy function, samples must be drawn from the energy model.
 
 In this work we present a set of improvements to contrastive divergence training of EBMs, enabling more stable, high resolution generation with EBMs. In particular we propose to:
@@ -126,34 +127,54 @@ Improve sample diversity by maintaing a reservoir buffer of past samples from th
 </li>
 </ul>
 
-<h2>Results<h2>
+<h2>Contrastive Divergence</h2>
 
-<h3>Image Generation</h3>
+A common objective used to train EBMs is <a =href="https://www.cs.toronto.edu/~hinton/absps/tr00-004.pdf">contrastive divergence</a>. Contrastive divergence consists of the following objective:
 
-We illustrate our proposed image generation process in EBMs below. We intersperse Langevin sampling with data augmentation transitions, enabling image sampling chains from our model to traverse across a large number of modes in the energy landscape. 
-
+<p>
+<center><a> <img src="fig/cd.png" style="float:none;width:400px"> </a></center>
 </p>
-<center>
-<video width="480" height="480" controls>
-  <source src="fig/uncond_gen.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-</center>
+
+where we the minimize the difference between the KL divergence of the data distribution and EBM distribution, and the KL divergence of finite number of MCMC steps on data distribution and EBM distribution.
+
+This objective has a key gradient (highlighted in red) that is ignored.
+
+<p>
+<center><a> <img src="fig/cd_grad.png" style="float:none;width:600px"> </a></center>
+</p>
+
+We present a loss to capture this gradient (see our paper for details), and find that this missing gradient contributes substantially to the overall training gradient of a EBM.
+
+<p>
+<center><a> <img src="fig/cd_kl.png" style="float:none;width:400px"> </a></center>
+</p>
+
+
+
+We further show below that that by adding  a KL term into contrastive divergence training of energy models, overall training is greatly stabilized. In the graph below, we investigate the energy difference between real images and generated samples with or without the KL term. Stable EBM training corresponds to an energy difference of around 0. We find that the addition of the KL loss term enables incoperation of architectural blocks such as self-attention and normalization, while the absence of the KL term leads to a necessity of spectral normalization to train models stably.
+
+<p>
+<center><a> <img src="fig/kl_yes.png" style="float:none;width:800px"> </a></center>
+</p>
+
+<h2>Data Augmentation</h2>
+
+We illustrate our the overall image generation process with EBMs below. We intersperse Langevin sampling with data augmentation transitions, enabling image sampling chains from our model to traverse across a large number of modes in the energy landscape. 
+
+
+<p>
+<center><a> <img src="fig/uncond_gen.gif" style="float:none;width:480"> </a></center>
 </p>
 
 
 When comparing samples initialized from the same random noise value, we find that with data augmentation to aid sampling, we get significantly more diverse samples than without. 
 
-</p>
-<center>
-<video width="960" height="480" controls>
-  <source src="fig/diverse_sample.m4v" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-</center>
+<p>
+<center><a> <img src="fig/diverse_sample.gif" style="float:none;width:480"> </a></center>
 </p>
 
 
+<!---
 We propose to decompose our energy function as the compositional sum of energy functions operating on different resolutions of images. We illustrate generations of using either only each individual coarse energy function or an EBM consisting compositional sum of each model.
 
 </p>
@@ -164,184 +185,36 @@ We propose to decompose our energy function as the compositional sum of energy f
 </video>
 </center>
 </p>
+-->
 
-
-
-We further show below that that by adding  a KL term into contrastive divergence training of energy models, overall training is greatly stabilized. In the graph below, we investigate the energy difference between real images and generated samples with or without the KL term. Stable EBM training corresponds to an energy different of 0. We find taht the addition of the KL loss term enables incoperation of architectural blocks such as self-attention and normalization, while the absence of the KL term leads to a necessity of spectral normalization to train models stably.
-
-<p>
-<center><a> <img src="fig/kl_yes.png" style="float:none;width:800px"> </a></center>
-</p>
-
-
-
-<h3>Compositional Generation</h3>
+<h3>Zero Shot Compositional Generation</h3>
 
 EBMs are able to independently compose with other <a href="https://energy-based-model.github.io/compositional-generation-inference/">EBMs</a>, allowing us flexibly compose generation across seperate models. We show that our approach enables compositional generation across different domains.
 
 
 We independently train EBMs for CelebA factors of age, gender, smiling, and wavy hair. We show below that by adding each energy model in generation, we are able to gradually able to construct and change generations to exhibit each desired factor, as encoded by an individual energy function.
 
+<p>
+<center><a> <img src="fig/comp_face.gif" style="float:none;width:360"> </a></center>
 </p>
-<center>
-<video width="480" height="480" controls>
-  <source src="fig/comp_face.m4v" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-</center>
-</p>
+
 
 
 We can further independently train EBMs on rendering attributes of shape, size, position and rotation. By adding independent energy model in generation, we are also able to gradually construct generations that exhibit each desired factor.
 
-</p>
-<center>
-<video width="480" height="480" controls>
-  <source src="fig/comp_blender.m4v" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-</center>
+<p>
+<center><a> <img src="fig/comp_blender.gif" style="float:none;width:360"> </a></center>
 </p>
 
 
 <h3>Out of Distribution Detection</h3>
-We further find that our approach significantly outperforms past energy based models on the task of likelihood-based out-of-distribution detection. Please see our paper for more details.
-
-
-
-<!---
-<h3>A Missing Term in Contrastive Divergence</h3>
-
-In concept disjunction, given separate concepts such as the colors red and blue, we wish to construct an output that is either red or blue. We wish to construct a new distribution that has probability mass when any chosen concept is true. A natural choice of such a distribution is the sum of the likelihood of each concept:
-
-\[ p(x|c_1 \; \text{or} \; c_2, \ldots \; \text{or}  \; c_i) \propto \sum_i p(x|c_i) / Z(c_i). \]
-
-where \( Z(c_i) \) denotes partition function for the chosen concept.
-
-Through our implicit sampling procedure, by assuming partition functions are equal, we can then generate samples using  
-
-\[ \tilde{\mathbb{x}}^k = \tilde{\mathbb{x}}^{k-1} - \frac{\lambda}{2} \nabla_\mathbb{x} \text{logsumexp}(-E(x|c_i))  + \omega^k \]
-
-<center><a>
-<img src="fig/disjunction.jpg" style="float:none;width:300px"> 
-</a></center>
-
-<h3>Data Augmentation Transitions</h3>
-
-In concept negation, we wish to generate an output that does not contain the concept. Given a color red, we want an output that is of a different color, such as blue. Thus, we want to construct a distribution that places high likelihood to data that is outside a given concept. One choice is a distribution inversely proportional to the concept. Importantly, negation must be defined with respect to another concept to be useful. The opposite of alive may be dead, but not inanimate. Negation without a data distribution is not integrable and leads to a generation of chaotic textures which, while satisfying absence of a concept, is not desirable. Thus in our experiments with negation we combine it with another concept to ground the negation and obtain an integrable distribution:
-
-\[ p(x| \text{not}(c_1), c_2) \propto \frac{p(x|c_2)}{p(x|c_1)^\alpha} \propto e^{ \alpha  E(x|c_1) - E(x|c_2) } \]
-
-Through our implicit sampling procedure, by assuming partition functions are equal, we can then generate samples using
-
-\[ \tilde{\mathbb{x}}^k = \tilde{\mathbb{x}}^{k-1} - \frac{\lambda}{2} \nabla_\mathbb{x} (\alpha E(x|c_1) - E(x|c_2)) + \omega^k \]
-
-
-</p>
-
-<center><a>
-<img src="fig/negation.jpg" style="float:none;width:300px"> 
-</a></center>
-
-<h3>Reservoir Sampling</h3>
-
-Pass
-
-<h3>Multiscale Generation</h3>
-
-
-<h2>Results</h2>
-
-<h3>Compositionality</h3>
-
-Our approach allows compositionality 
-We first explore the ability of our models to compose across different attributes. We train seperate EBMs on the attributes of shape, position, size and color. Through conjunction on each model sequentially, we are able to generate successively more refined versions of an object scene.
-
-<center><img src="fig/com_cube.jpg" style="float:none;width:500px"> </center>
-</p>
-
-We can similarily train seperate EBMs on the attributes of young, female, smiling, and wavy hair. Through conjunction on each model sequentially, we are able to generate successively more refined versions of human faces.
-
-<p>
-<center><img src="fig/com_human.jpg" style="float:none;width:400px"> </center>
-</p>
-
-Surprisingly, we find that generations of our model are able to become increasingly more refined by adding more models.
-
-
-We can further compose seperately trained models in additional ways by nesting operations of conjunction, disjunction and negation. In the figure below, we showcase face generations by nesting compositions of each operator.
-
-<p>
-<center><a><img src="fig/symbolic.jpg" style="float:none;width:400px"> </a></center>
-</p>
-
-<p>
-<h3>Object Level Compositionality</h3>
-
-We can also learn EBMs on the object attributes. We train a single EBM model to represent the position attribute. By summing EBMs conditioned on two different positions (conjunction), we can compositionally generate different number of cubes at the object level.
-
-</p>
-<p>
-<center><a> <img src="fig/multiobject.jpg" style="float:none;width:250px"> </a></center>
-</p>
-
-Suprisingly, we find that when conditioned cubes are too close to each other, a single cube is instead genereated.
-
-<p>
-<h2>Continual Learning in Generation</h2>
-
-By having the ability to compose independently models, EBMs allow us to continually learn to generate new images with both new and old visual concepts. To test this we consider:
-
-<br>
-<br>
-<ul id='continual_dataset'>
-<li font-size: 6px>
-A dataset consisting of position annotations of purple cubes at different positions.
-</li>
-
-<li font-size: 6px>
-A dataset consisting of shape annotations of different purple shapes at different positions.
-</li>
-
-<li font-size: 6px>
-A dataset consisting of color annotations of different color shapes at different positions.
-</li>
-</ul>
-
-We train a new EBM model for attributes of position, shape, and color, and find that composing our three attribute EBMs together, we can precisely generate shapes of different position, shape and color objects! This is inspite of the fact that the position and shape models have not seen many such possible combinations during training.
-
-</p>
-<p>
-<center><a> <img src="fig/continuous.jpg" style="float:none;width:300px"> </a></center>
-</p>
+We further find that our approach significantly outperforms past energy based models on the task of simply using the likelihood of the EBM for out-of-distribution detection.
 
 
 <p>
-<h2>Compositional Inference</h2>
-
-<h3>Inference</h3>
-In concept inference, we wish to infer the underlying concepts that best explains a given image. Given a learned EBM on \( E(x|c) \), we do inference to find the underlying concept \( c \) by
-
-\[ c = \text{argmin}_c E(x|c) \]
-
-If we know that a set of different \( x_i \) that all have the same underlying concept \( c \), we can then use conjunction to obtain , 
-
-\[ c = \text{argmin}_c \sum_i E(x_i|c) \]
-
-<h3>Compositional Inference Across Multiple Views</h3>
-
-We test the above compositional reasoning on inferring the position of a cube given different view of the same image. By doing inference on the latent of EBM in the above manner, we find that we can obtain better predictions of positions.
-
-<center><a> <img src="fig/multiobj.jpg" style="float:none;width:400px"> </a></center>
-
-<h3>Compositional Inference In One Image</h3>
-
-We can further test the ability of our model to implicitly compositionally infer the positions of multiple cubes when the model is trained on scenes with a single cube at different positions. We show the positions that are assigned low energy by our EBM in a heatmap below. We find that a single EBM can compositionally infer the presence of multiple cubes, despite only being trained on a single cube. 
-
-<center><a> <img src="fig/multiobject_compositionality.jpg" style="float:none;width:400px"> </a></center>
+<center><a> <img src="fig/ood.png" style="float:none;width:800px"> </a></center>
 </p>
 
--->
 
 <h2>Our Additional Work on Energy-Based Models</h2>
 
