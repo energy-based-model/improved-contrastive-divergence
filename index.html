@@ -105,9 +105,11 @@ We propose several different techniques to improve contrastive divergence traini
 <p>
 <h2>Method</h2>
 
+<p style="font-size:14px">
 Energy based models (EBMs) represent the likelihood of a probability distribution of data by assigning an unnormalized probability scalar (or "energy") to each input data point. This provides significant model flexibility; any arbitrary model that outputs a real number can be used as an energy model. A difficulty however, is that training EBMs is hard, as to properly maximize the likelihood of an energy function, samples must be drawn from the energy model.
 
 In this work we present a set of improvements to contrastive divergence training of EBMs, enabling more stable, high resolution generation with EBMs. In particular we propose to:
+</p>
 
 <ul id='cd'>
 <li font-size: 6px>
@@ -129,21 +131,27 @@ Improve sample diversity by maintaing a reservoir buffer of past samples from th
 
 <h2>Contrastive Divergence</h2>
 
+<p style="font-size:14px">
 A common objective used to train EBMs is <a =href="https://www.cs.toronto.edu/~hinton/absps/tr00-004.pdf">contrastive divergence</a>. Contrastive divergence consists of the following objective:
+</p>
 
 <p>
 <center><a> <img src="fig/cd.png" style="float:none;width:400px"> </a></center>
 </p>
 
+<p style="font-size:14px">
 where we the minimize the difference between the KL divergence of the data distribution and EBM distribution, and the KL divergence of finite number of MCMC steps on data distribution and EBM distribution.
 
 This objective has a key gradient (highlighted in red) that is ignored.
+</p>
 
 <p>
 <center><a> <img src="fig/cd_grad.png" style="float:none;width:600px"> </a></center>
 </p>
 
+<p style="font-size:14px">
 We present a loss to capture this gradient (see our paper for details), and find that this missing gradient contributes substantially to the overall training gradient of a EBM.
+</p>
 
 <p>
 <center><a> <img src="fig/cd_kl.png" style="float:none;width:400px"> </a></center>
@@ -151,7 +159,9 @@ We present a loss to capture this gradient (see our paper for details), and find
 
 
 
+<p style="font-size:14px">
 We further show below that that by adding  a KL term into contrastive divergence training of energy models, overall training is greatly stabilized. In the graph below, we investigate the energy difference between real images and generated samples with or without the KL term. Stable EBM training corresponds to an energy difference of around 0. We find that the addition of the KL loss term enables incoperation of architectural blocks such as self-attention and normalization, while the absence of the KL term leads to a necessity of spectral normalization to train models stably.
+</p>
 
 <p>
 <center><a> <img src="fig/kl_yes.png" style="float:none;width:800px"> </a></center>
@@ -159,15 +169,19 @@ We further show below that that by adding  a KL term into contrastive divergence
 
 <h2>Data Augmentation</h2>
 
+<p style="font-size:14px">
 We illustrate our the overall image generation process with EBMs below. We intersperse Langevin sampling with data augmentation transitions, enabling image sampling chains from our model to traverse across a large number of modes in the energy landscape. 
 
+</p>
 
 <p>
 <center><a> <img src="fig/uncond_gen.gif" style="float:none;width:480"> </a></center>
 </p>
 
 
+<p style="font-size:14px">
 When comparing samples initialized from the same random noise value, we find that with data augmentation to aid sampling, we get significantly more diverse samples than without. 
+</p>
 
 <p>
 <center><a> <img src="fig/diverse_sample.gif" style="float:none;width:480"> </a></center>
@@ -189,10 +203,12 @@ We propose to decompose our energy function as the compositional sum of energy f
 
 <h3>Zero Shot Compositional Generation</h3>
 
+<p style="font-size:14px">
 EBMs are able to independently compose with other <a href="https://energy-based-model.github.io/compositional-generation-inference/">EBMs</a>, allowing us flexibly compose generation across seperate models. We show that our approach enables compositional generation across different domains.
 
 
 We independently train EBMs for CelebA factors of age, gender, smiling, and wavy hair. We show below that by adding each energy model in generation, we are able to gradually able to construct and change generations to exhibit each desired factor, as encoded by an individual energy function.
+</p>
 
 <p>
 <center><a> <img src="fig/comp_face.gif" style="float:none;width:360"> </a></center>
@@ -200,7 +216,9 @@ We independently train EBMs for CelebA factors of age, gender, smiling, and wavy
 
 
 
+<p style="font-size:14px">
 We can further independently train EBMs on rendering attributes of shape, size, position and rotation. By adding independent energy model in generation, we are also able to gradually construct generations that exhibit each desired factor.
+</p>
 
 <p>
 <center><a> <img src="fig/comp_blender.gif" style="float:none;width:360"> </a></center>
@@ -208,7 +226,9 @@ We can further independently train EBMs on rendering attributes of shape, size, 
 
 
 <h3>Out of Distribution Detection</h3>
+<p style="font-size:14px">
 We further find that our approach significantly outperforms past energy based models on the task of simply using the likelihood of the EBM for out-of-distribution detection.
+</p>
 
 
 <p>
@@ -218,7 +238,9 @@ We further find that our approach significantly outperforms past energy based mo
 
 <h2>Our Additional Work on Energy-Based Models</h2>
 
+<p style="font-size:14px">
 If interested, here are additional works from us on utilizing energy models:
+</p>
 
 <ul id='relatedwork'>
 <li font-size: 15px>
