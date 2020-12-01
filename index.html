@@ -136,7 +136,7 @@ A common objective used to train EBMs is <a =href="https://www.cs.toronto.edu/~h
 </p>
 
 <p>
-<center><a> <img src="fig/cd.png" style="float:none;width:400px"> </a></center>
+<center><a> <img src="fig/cd.png" style="float:none;width:300px"> </a></center>
 </p>
 
 <p style="font-size:14px">
@@ -146,7 +146,7 @@ This objective has a key gradient (highlighted in red) that is often ignored.
 </p>
 
 <p>
-<center><a> <img src="fig/cd_grad.png" style="float:none;width:600px"> </a></center>
+<center><a> <img src="fig/cd_grad.png" style="float:none;width:450px"> </a></center>
 </p>
 
 <p style="font-size:14px">
@@ -175,11 +175,11 @@ We illustrate our the overall image generation process with EBMs below. We inter
 </p>
 
 <p>
-<center><a> <img src="fig/langevin_data.gif" style="float:none;width:480"> </a></center>
+<center><a> <img src="fig/langevin_data.gif" style="float:none;width:480px"> </a></center>
 </p>
 
 <p>
-<center><a> <img src="fig/uncond_gen.gif" style="float:none;width:480"> </a></center>
+<center><a> <img src="fig/uncond_gen.gif" style="float:none;width:320px"> </a></center>
 </p>
 
 
@@ -188,7 +188,7 @@ When comparing samples initialized from the same random noise value, we find tha
 </p>
 
 <p>
-<center><a> <img src="fig/diverse_sample.gif" style="float:none;width:480"> </a></center>
+<center><a> <img src="fig/diverse_sample.gif" style="float:none;width:740px"> </a></center>
 </p>
 
 
@@ -214,9 +214,16 @@ EBMs are able to independently compose with other <a href="https://energy-based-
 We independently train EBMs for CelebA factors of age, gender, smiling, and wavy hair. We show below that by adding each energy model in generation, we are able to gradually able to construct and change generations to exhibit each desired factor, as encoded by an individual energy function.
 </p>
 
+<!---
 <p>
-<center><a> <img src="fig/comp_face.gif" style="float:none;width:360"> </a></center>
+<center><a> <img src="fig/comp_face.gif" style="float:none;width:800px"> </a></center>
 </p>
+--->
+
+<video width="1080" height="360" controls autoplay>
+  <source src="fig/comp_face.m4v" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 
 
@@ -224,9 +231,16 @@ We independently train EBMs for CelebA factors of age, gender, smiling, and wavy
 We can further independently train EBMs on rendering attributes of shape, size, position and rotation. By adding independent energy model in generation, we are also able to gradually construct generations that exhibit each desired factor.
 </p>
 
+<!---
 <p>
-<center><a> <img src="fig/comp_blender.gif" style="float:none;width:360"> </a></center>
+<center><a> <img src="fig/comp_blender.gif" style="float:none;width:800px"> </a></center>
 </p>
+-->
+
+<video width="1080" height="360" controls autoplay>
+  <source src="fig/comp_blender.m4v" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 
 <h2>Out of Distribution Detection</h2>
@@ -236,7 +250,7 @@ We further find that our approach significantly outperforms past energy based mo
 
 
 <p>
-<center><a> <img src="fig/ood.png" style="float:none;width:800px"> </a></center>
+<center><a> <img src="fig/ood.png" style="float:none;width:450px"> </a></center>
 </p>
 
 
