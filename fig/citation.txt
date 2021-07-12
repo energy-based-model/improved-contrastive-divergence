@@ -1,6 +1,7 @@
-@article{du2020improved,
+@article{du2021improved,
   title={Improved Contrastive Divergence Training of Energy Based Models},
   author={Du, Yilun and Li, Shuang and Tenenbaum, Joshua and Mordatch, Igor},
-  journal={arXiv preprint arXiv:2012.01316},
-  year={2020}
+  journal={Proceedings of the 38th International Conference on Machine
+Learning (ICML-21)},
+  year={2021}
 }
